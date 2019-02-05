@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af7181f404f1447c0a7a17b3070b952b, type: 3}
-  m_Name: Dirt
+  m_Name: Stone
   m_EditorClassIdentifier: 
   m_Angles:
   - m_Start: -360
     m_End: 0
     m_Order: 1
     m_Sprites:
-    - {fileID: 21300000, guid: 14b904cebea474d4da0606c3b3346d19, type: 3}
-  m_FillTexture: {fileID: 2800000, guid: 37db47663e646e047a6f024caf373a83, type: 3}
+    - {fileID: 21300000, guid: c73c21427a213e943942f218868cf3f9, type: 3}
+  m_FillTexture: {fileID: 2800000, guid: 89d6d7a117574354f9b10ac6e6259962, type: 3}
   m_CornerSprites:
   - m_CornerType: 0
     m_Sprites:
-    - {fileID: 21300000, guid: fee533004de516e4b89d0bd1aa816a78, type: 3}
+    - {fileID: 0}
   - m_CornerType: 1
     m_Sprites:
     - {fileID: 0}
@@ -44,9 +44,9 @@ MonoBehaviour:
   - m_CornerType: 7
     m_Sprites:
     - {fileID: 0}
-  m_FillPixelPerUnit: 128
+  m_FillPixelPerUnit: 512
   m_BevelSize: 0
   m_BevelCutoff: 0
-  m_FillOffset: 0.2
+  m_FillOffset: 0
   m_WorldSpaceUV: 1
   m_UseSpriteBorders: 1
