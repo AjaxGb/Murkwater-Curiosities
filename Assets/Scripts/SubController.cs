@@ -1,6 +1,7 @@
 ﻿using Cinemachine;
 using UnityEngine;
 
+[SelectionBase]
 [RequireComponent(typeof(Rigidbody2D))]
 public class SubController : MonoBehaviour {
 
@@ -24,12 +25,14 @@ public class SubController : MonoBehaviour {
 	[SerializeField] private float driveLean = 1.0f;
 	[SerializeField] private float riseLean = -1.0f;
 	[SerializeField] private float diveLean = 1.0f;
-	[SerializeField] private float leanTorque = 2.0f;
+	[SerializeField] private float rightingSpeed = 0.1f;
+	[SerializeField] private float rightingTime = 1.0f;
 
 	public VState VerticalState { get; private set; }
 	public HState HorizontalState { get; private set; }
 
 	private Vector2 velocity;
+	private float rotVelocity;
 
 	void Start() {
 
@@ -91,12 +94,8 @@ public class SubController : MonoBehaviour {
 		rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
 
 		// Rotation
-
-		// TODO: Make it better
-
-		Debug.Log(rb.rotation);
-		float rotationVel = targetRot - rb.rotation;
-		Utils.ClampSymmetric(ref rotationVel, leanTorque);
-		rb.MoveRotation(rb.rotation + rotationVel);
+		
+		rb.MoveRotation(
+			Mathf.SmoothDampAngle(rb.rotation, targetRot, ref rotVelocity, rightingTime, rightingSpeed));
 	}
 }
