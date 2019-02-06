@@ -5180,9 +5180,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117784520}
+  - component: {fileID: 1117784521}
   - component: {fileID: 1117784519}
   m_Layer: 0
-  m_Name: OceanTexture
+  m_Name: Water BG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5244,12 +5245,28 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1117784518}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 7.96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1117784521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117784518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7d8d45c92878f46baa24d4bcc5e3ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 519420031}
+  cameraYInitial: 0
+  waterYInitial: 0
+  movementScale: 0.8
 --- !u!1 &1255801814
 GameObject:
   m_ObjectHideFlags: 0
@@ -5625,7 +5642,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1304718360
 GameObject:
@@ -5828,7 +5845,7 @@ Transform:
   - {fileID: 281739660}
   - {fileID: 2096825136}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1343757019
 MonoBehaviour:
@@ -5934,7 +5951,7 @@ SpriteRenderer:
   m_SortingLayerID: -182062245
   m_SortingLayer: -1
   m_SortingOrder: 9
-  m_Sprite: {fileID: 21300000, guid: 172f19032f0db214a92e3f3c87179fd1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ed8230f111136d547bd34de04b6c3760, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
