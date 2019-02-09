@@ -1,5 +1,4 @@
-﻿using Cinemachine;
-using UnityEngine;
+﻿using UnityEngine;
 
 [SelectionBase]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -10,7 +9,6 @@ public class SubController : MonoBehaviour {
 	
 	[SerializeField] private Rigidbody2D rb;
 	[SerializeField] private SpriteRenderer mainSprite;
-	[SerializeField] private CinemachineTargetGroup targetGroup;
 	[Space]
 	public float waterLevel = 0.5f;
 	[SerializeField] private float floatMidpoint = 0.5f;
@@ -79,7 +77,6 @@ public class SubController : MonoBehaviour {
 			}
 
 #if UNITY_EDITOR
-			Debug.LogFormat("In Water: {0:P}\nAt Surface: {1:P}", inWaterPercent, atSurfacePercent);
 			Debug.DrawRay(new Vector2(currPosition.x - 2, waterLevel), Vector2.right * 4, Color.blue);
 			Debug.DrawLine(new Vector2(currPosition.x, floatBottom), new Vector2(currPosition.x, floatTop), Color.red);
 			Debug.DrawRay(new Vector2(currPosition.x, floatTop), Vector2.up * bouyancyRadiusBonus, Color.green);

@@ -9,7 +9,7 @@ public class WaterParallax : MonoBehaviour {
 	public float waterYInitial = 0.0f;
 	public float movementScale = 0.01f;
 	
-	void Update() {
+	void LateUpdate() {
 		float cameraTopY = camera.ViewportToWorldPoint(Vector2.up).y;
 
 		Vector3 pos = transform.position;
