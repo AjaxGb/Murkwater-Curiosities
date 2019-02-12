@@ -44,6 +44,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Foreground
+    uniqueID: 637187663
+    locked: 0
   - name: Attack FX
     uniqueID: 53695185
     locked: 0
