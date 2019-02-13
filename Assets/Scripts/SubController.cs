@@ -69,6 +69,9 @@ public class SubController : MonoBehaviour {
 	public RectTransform healthDisplay;
 	public TextMeshProUGUI moneyDisplay;
 
+	public ParticleSystem bubbleParticles;
+	public float bubbleSpeedScale = 5;
+
 	[SerializeField] private float maxHealth = 100;
 	private float _currHealth;
 	public float CurrHealth {
@@ -103,6 +106,10 @@ public class SubController : MonoBehaviour {
 	}
 
 	void Update() {
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			Application.Quit();
+		}
+
 		if (Time.timeScale == 0) return;
 
 		if (laserCurrTimeout > Time.deltaTime) {
@@ -227,10 +234,10 @@ public class SubController : MonoBehaviour {
 		}
 
 		if (targetVel.x != 0) {
-			mainSprite.flipX = targetVel.x < 0;
+			mainSprite.transform.localScale = new Vector3(targetVel.x < 0 ? -1 : 1, 1, 1);
 		}
 
-		if (mainSprite.flipX) {
+		if (mainSprite.transform.localScale.x < 0) {
 			targetRot = -targetRot;
 		}
 
@@ -246,6 +253,12 @@ public class SubController : MonoBehaviour {
 
 		Vector2 gravity = Vector2.down * outOfWaterGravity * Time.fixedDeltaTime;
 		velocity += gravity * gravityStrengthCurve.Evaluate(outOfWaterPercent);
+
+		float bubbleMultiplier = Mathf.Max(1, velocity.sqrMagnitude / bubbleSpeedScale);
+
+		var bubbleEmission = bubbleParticles.emission;
+		bubbleEmission.rateOverTimeMultiplier = bubbleMultiplier;
+		bubbleEmission.rateOverDistanceMultiplier = bubbleMultiplier;
 
 		rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
 
