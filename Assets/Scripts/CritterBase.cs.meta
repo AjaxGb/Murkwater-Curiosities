@@ -3,7 +3,10 @@ guid: 4b2d6c7da8172b04497790e9ad7dc34f
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - critterDB: {instanceID: 0}
+  - deathExplosion: {fileID: 4932977130973084301, guid: 46aca4aedbc8ced4bb5eec80efc04243,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -46,18 +46,60 @@ public class CritterDatabase : MonoBehaviour {
 		}
 	}
 
-	private Dictionary<string, CritterInfo> infoMap = new Dictionary<string, CritterInfo>();
+	private class CritterData {
+		public CritterInfo info;
+		public int foundDead;
+		public int foundAlive;
+
+		public bool Found => foundDead > 0 || foundAlive > 0;
+
+		public CritterData(CritterInfo info) {
+			this.info = info;
+			this.foundDead = 0;
+			this.foundAlive = 0;
+		}
+	}
+
+	private Dictionary<string, CritterData> infoMap = new Dictionary<string, CritterData>();
 
 	void Awake() {
 		if (!Main) Main = this;
 	}
 
 	public void Register(string id, CritterInfo info) {
-		CritterInfo existing;
+		CritterData existing;
 		if (!infoMap.TryGetValue(id, out existing)) {
-			infoMap.Add(id, info);
-		} else if (info != existing) {
-			Debug.LogErrorFormat(@"Tried to register two different info blocks to the same ID ({0})", id);
+			infoMap.Add(id, new CritterData(info));
+		} else if (info != existing.info) {
+			Debug.LogErrorFormat("Tried to register two different info blocks to the same ID ({0})", id);
 		}
+	}
+
+	public bool WasCaptured(string id) {
+		CritterData existing;
+		if (!infoMap.TryGetValue(id, out existing)) {
+			Debug.LogErrorFormat("Tried to check capture for an unregistered ID ({0})", id);
+			return false;
+		}
+
+		return existing.Found;
+	}
+
+	public bool Captured(string id, bool alive) {
+		CritterData existing;
+		if (!infoMap.TryGetValue(id, out existing)) {
+			Debug.LogErrorFormat("Tried to capture an unregistered ID ({0})", id);
+			return false;
+		}
+
+		bool wasFound = existing.Found;
+
+		if (alive) {
+			existing.foundAlive++;
+		} else {
+			existing.foundDead++;
+		}
+
+		return !wasFound;
 	}
 }

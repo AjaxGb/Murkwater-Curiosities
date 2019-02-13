@@ -1,8 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [SelectionBase]
 [RequireComponent(typeof(Rigidbody2D))]
 public class SubController : MonoBehaviour {
+
+	public static SubController Main;
 
 	public enum VState { SINK, RISE, DIVE };
 	public enum HState { DRIVE, REST };
@@ -29,6 +34,7 @@ public class SubController : MonoBehaviour {
 	[SerializeField] private float horizSpeed = 0.6f;
 	[SerializeField] private float horizAccel = 1.0f;
 	[SerializeField] private float horizRestAccel = 0.3f;
+	[SerializeField] private float speedBoost = 2.0f;
 	[Space]
 	[SerializeField] private float driveLean = 1.0f;
 	[SerializeField] private float riseLean = -1.0f;
@@ -43,11 +49,114 @@ public class SubController : MonoBehaviour {
 	private Vector2 velocity;
 	private float rotVelocity;
 
+	public float laserCurrTimeout = 0;
+	public float laserMaxTimeout = 2;
+	public float sonicCurrTimeout = 0;
+	public float sonicMaxTimeout = 10;
+	public float maxLaserDist = 100;
+	public LayerMask laserLayers;
+
+	public RectTransform laserTimeoutOverlay;
+	public RectTransform sonicTimeoutOverlay;
+
+	public SpriteRenderer laserPrefab;
+	public float laserRenderDuration = 0.2f;
+	public float laserDamage = 5;
+
+	public ParticleSystem sonicParticles;
+	public float sonicRadius = 5;
+
+	public RectTransform healthDisplay;
+	public TextMeshProUGUI moneyDisplay;
+
+	[SerializeField] private float maxHealth = 100;
+	private float _currHealth;
+	public float CurrHealth {
+		get => _currHealth;
+		set {
+			_currHealth = Mathf.Clamp(value, 0, maxHealth);
+			healthDisplay.localScale = new Vector2(1, _currHealth / maxHealth);
+
+			if (_currHealth <= 0) {
+				Time.timeScale = 0;
+				SceneManager.LoadSceneAsync(gameObject.scene.buildIndex, LoadSceneMode.Single);
+			}
+		}
+	}
+
+	private int _currMoney;
+	public int CurrMoney {
+		get => _currMoney;
+		set {
+			_currMoney = value;
+
+			moneyDisplay.text = _currMoney.ToString("$00000");
+		}
+	}
+
 	void Start() {
+		if (!Main) Main = this;
 		lastPosition = rb.position;
+
+		CurrHealth = maxHealth;
+		CurrMoney = 0;
 	}
 
 	void Update() {
+		if (Time.timeScale == 0) return;
+
+		if (laserCurrTimeout > Time.deltaTime) {
+			laserCurrTimeout -= Time.deltaTime;
+		} else {
+			laserCurrTimeout = 0;
+		}
+
+		if (sonicCurrTimeout > Time.deltaTime) {
+			sonicCurrTimeout -= Time.deltaTime;
+		} else {
+			sonicCurrTimeout = 0;
+		}
+
+		Vector2 currPos = transform.position;
+
+		if (laserCurrTimeout <= 0 && Input.GetMouseButtonDown(0)) {
+			Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			RaycastHit2D hit = Physics2D.Raycast(transform.position, target - currPos, maxLaserDist, laserLayers);
+			Vector2 endPos = hit ? hit.point : currPos + (target - currPos).normalized * maxLaserDist;
+
+			Vector2 length = endPos - currPos;
+			SpriteRenderer laser = Instantiate(laserPrefab, currPos, Quaternion.FromToRotation(Vector2.right, length));
+			Vector2 size = laser.size;
+			size.x = length.magnitude;
+			laser.size = size;
+			Destroy(laser.gameObject, laserRenderDuration);
+
+			if (hit) {
+				CritterBase critter = hit.transform.GetComponentInParent<CritterBase>();
+				if (critter) {
+					critter.Hurt(laserDamage);
+				}
+			}
+
+			laserCurrTimeout = laserMaxTimeout;
+		}
+
+		if (sonicCurrTimeout <= 0 && Input.GetMouseButtonDown(1)) {
+
+			sonicParticles.Play();
+
+			foreach (Collider2D collider in Physics2D.OverlapCircleAll(transform.position, sonicRadius)) {
+				CritterBase critter = collider.GetComponentInParent<CritterBase>();
+				if (!critter) continue;
+				critter.Stun();
+			}
+
+			laserCurrTimeout = sonicMaxTimeout;
+			sonicCurrTimeout = sonicMaxTimeout;
+		}
+
+		laserTimeoutOverlay.localScale = new Vector2(1, Mathf.Clamp01(laserCurrTimeout / laserMaxTimeout));
+		sonicTimeoutOverlay.localScale = new Vector2(1, Mathf.Clamp01(sonicCurrTimeout / sonicMaxTimeout));
 	}
 	
 	void FixedUpdate() {
@@ -84,20 +193,22 @@ public class SubController : MonoBehaviour {
 #endif
 		}
 
+		float modifier = Input.GetKey(KeyCode.LeftShift) ? speedBoost : 1;
+
 		float xMaxAccel, yMaxAccel;
 
 		float vertInput = Input.GetAxis("Vertical");
 		float horizInput = Input.GetAxis("Horizontal");
 		
 		if (vertInput < 0) {
-			targetVel.y = vertInput * diveSpeed;
+			targetVel.y = vertInput * diveSpeed * modifier;
 			targetRot += -vertInput * diveLean;
-			yMaxAccel = diveAccel;
+			yMaxAccel = diveAccel * modifier;
 			VerticalState = VState.DIVE;
 		} else if (vertInput > 0) {
-			targetVel.y = vertInput * riseSpeed;
+			targetVel.y = vertInput * riseSpeed * modifier;
 			targetRot += vertInput * riseLean;
-			yMaxAccel = riseAccel;
+			yMaxAccel = riseAccel * modifier;
 			VerticalState = VState.RISE;
 		} else {
 			targetVel.y = -sinkSpeed;
@@ -107,8 +218,8 @@ public class SubController : MonoBehaviour {
 
 		if (horizInput != 0) {
 			HorizontalState = HState.DRIVE;
-			targetVel.x = horizInput * horizSpeed;
-			xMaxAccel = horizAccel;
+			targetVel.x = horizInput * horizSpeed * modifier;
+			xMaxAccel = horizAccel * modifier;
 			targetRot += Mathf.Abs(horizInput) * driveLean;
 		} else {
 			xMaxAccel = horizRestAccel;
